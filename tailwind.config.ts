@@ -96,6 +96,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			boxShadow: {
+				'trust': '0 4px 20px hsl(230 70% 30% / 0.15)',
+				'success': '0 4px 20px hsl(142 71% 45% / 0.15)',
+				'premium': '0 4px 20px hsl(43 96% 56% / 0.15)',
+				'card': '0 2px 10px hsl(220 13% 18% / 0.08)',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
