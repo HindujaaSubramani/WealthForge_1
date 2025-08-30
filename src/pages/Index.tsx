@@ -48,7 +48,7 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-4">
               <LanguageToggle currentLanguage={language} onLanguageChange={setLanguage} />
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => navigate('/login')}>
                 <span className={language === 'ta' ? 'text-tamil' : ''}>
                   {language === 'en' ? 'Login' : 'உள்நுழை'}
                 </span>
@@ -75,12 +75,12 @@ const Index = () => {
                 {content[language].heroSubtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="btn-trust text-lg px-8 py-4">
+                <Button className="btn-trust text-lg px-8 py-4" onClick={() => navigate('/register')}>
                   <span className={language === 'ta' ? 'text-tamil' : ''}>
                     {content[language].getStarted}
                   </span>
                 </Button>
-                <Button variant="outline" className="text-lg px-8 py-4">
+                <Button variant="outline" className="text-lg px-8 py-4" onClick={() => navigate('/faq')}>
                   <span className={language === 'ta' ? 'text-tamil' : ''}>
                     {content[language].learnMore}
                   </span>
