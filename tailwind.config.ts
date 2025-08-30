@@ -18,12 +18,37 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'heading': ['Poppins', 'sans-serif'],
+				'body': ['Inter', 'sans-serif'],
+				'tamil': ['Noto Sans Tamil', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				
+				/* Brand Colors */
+				'trust-blue': {
+					DEFAULT: 'hsl(var(--trust-blue))',
+					light: 'hsl(var(--trust-blue-light))',
+				},
+				'security-green': {
+					DEFAULT: 'hsl(var(--security-green))',
+					light: 'hsl(var(--security-green-light))',
+				},
+				'premium-gold': {
+					DEFAULT: 'hsl(var(--premium-gold))',
+					light: 'hsl(var(--premium-gold-light))',
+				},
+				
+				/* Surface Colors */
+				surface: 'hsl(var(--surface))',
+				'surface-elevated': 'hsl(var(--surface-elevated))',
+				
+				/* Semantic Colors */
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -31,6 +56,14 @@ export default {
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
+				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',

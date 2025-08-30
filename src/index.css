@@ -1,40 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Tamil:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* P2P Lending Platform Design System - Professional & Trustworthy */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Brand Colors */
+    --trust-blue: 230 70% 30%;           /* #1E3A8A - Primary trust color */
+    --trust-blue-light: 230 70% 40%;     /* Lighter variant */
+    --security-green: 142 71% 45%;       /* #16A34A - Security & success */
+    --security-green-light: 142 71% 55%; /* Lighter variant */
+    --premium-gold: 43 96% 56%;          /* #FBBF24 - Premium highlights */
+    --premium-gold-light: 43 96% 66%;    /* Lighter variant */
+    
+    /* Professional Neutrals */
+    --background: 0 0% 100%;             /* Pure white */
+    --foreground: 220 13% 18%;           /* Professional dark */
+    --surface: 220 14% 96%;              /* Light grey surface */
+    --surface-elevated: 0 0% 98%;        /* Slightly elevated white */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Semantic Token Mappings */
+    --primary: var(--trust-blue);           /* Trust blue for primary actions */
+    --primary-foreground: 0 0% 100%;        /* White text on trust blue */
+    --secondary: var(--surface);            /* Light grey surface */
+    --secondary-foreground: var(--foreground); /* Dark text on light surface */
+    
+    --success: var(--security-green);       /* Success states */
+    --success-foreground: 0 0% 100%;        /* White text on green */
+    --warning: var(--premium-gold);         /* Warning/premium states */
+    --warning-foreground: 220 13% 18%;      /* Dark text on gold */
+    
+    /* Component Colors */
+    --card: var(--surface-elevated);        /* Card background */
+    --card-foreground: var(--foreground);   /* Card text */
+    --popover: var(--surface-elevated);     /* Popover background */
+    --popover-foreground: var(--foreground); /* Popover text */
+    
+    --muted: var(--surface);                /* Muted background */
+    --muted-foreground: 220 13% 55%;        /* Muted text */
+    --accent: var(--trust-blue-light);      /* Accent color */
+    --accent-foreground: 0 0% 100%;         /* White text on accent */
+    
+    --destructive: 0 84% 60%;               /* Error red */
+    --destructive-foreground: 0 0% 100%;    /* White text on red */
+    
+    --border: 220 13% 85%;                  /* Subtle borders */
+    --input: 220 13% 85%;                   /* Input borders */
+    --ring: var(--trust-blue);              /* Focus rings */
+    
+    /* Gradients */
+    --gradient-trust: linear-gradient(135deg, hsl(var(--trust-blue)), hsl(var(--trust-blue-light)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--security-green)), hsl(var(--security-green-light)));
+    --gradient-premium: linear-gradient(135deg, hsl(var(--premium-gold)), hsl(var(--premium-gold-light)));
+    --gradient-surface: linear-gradient(180deg, hsl(var(--surface-elevated)), hsl(var(--surface)));
+    
+    /* Shadows */
+    --shadow-trust: 0 4px 20px hsl(var(--trust-blue) / 0.15);
+    --shadow-success: 0 4px 20px hsl(var(--security-green) / 0.15);
+    --shadow-premium: 0 4px 20px hsl(var(--premium-gold) / 0.15);
+    --shadow-card: 0 2px 10px hsl(220 13% 18% / 0.08);
 
     --radius: 0.5rem;
 
@@ -100,6 +127,40 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  /* Trust-building button variants */
+  .btn-trust {
+    @apply bg-gradient-to-r from-trust-blue to-trust-blue-light text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-trust hover:scale-105;
+  }
+  
+  .btn-success {
+    @apply bg-gradient-to-r from-security-green to-security-green-light text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-success hover:scale-105;
+  }
+  
+  .btn-premium {
+    @apply bg-gradient-to-r from-premium-gold to-premium-gold-light text-warning-foreground font-medium px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-premium hover:scale-105;
+  }
+
+  /* Trust indicators */
+  .trust-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-surface-elevated to-surface rounded-full border border-border text-sm font-medium text-foreground shadow-card;
+  }
+
+  /* Professional cards */
+  .trust-card {
+    @apply bg-card border border-border rounded-xl p-6 shadow-card hover:shadow-trust transition-all duration-300 hover:-translate-y-1;
+  }
+
+  /* Language text styles */
+  .text-tamil {
+    font-family: 'Noto Sans Tamil', sans-serif;
   }
 }
