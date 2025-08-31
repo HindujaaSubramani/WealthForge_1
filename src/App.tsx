@@ -10,7 +10,9 @@ import KYCUpload from "./pages/KYCUpload";
 import RoleSelection from "./pages/RoleSelection";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
-
+import BorrowerLoanApplication from "./pages/BorrowerLoanApplication";
+import LenderOffer from "./pages/LenderOffer";
+import Complaints from "./pages/Complaints";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,6 +28,9 @@ const App = () => (
           <Route path="/kyc-upload" element={<KYCUpload />} />
           <Route path="/role-selection" element={<RoleSelection />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/borrower/apply-loan" element={<BorrowerLoanApplication />} />
+          <Route path="/complaints" element={<Complaints />} />
+          <Route path="/lender/offers" element={<LenderOffer />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

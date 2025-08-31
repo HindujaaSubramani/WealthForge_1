@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, User, DollarSign, FileText, Bell } from 'lucide-react';
 
 const Dashboard = () => {
   const [searchParams] = useSearchParams();
-  const role = searchParams.get('role') as 'borrower' | 'lender' | 'admin' || 'borrower';
+  const role = (searchParams.get('role') as 'borrower' | 'lender' | 'admin') || 'borrower';
   const [language, setLanguage] = useState<'en' | 'ta'>('en');
+  const navigate = useNavigate();   // ✅ use hook properly
 
   const dashboardContent = {
     borrower: {
@@ -82,6 +83,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navbar */}
       <nav className="bg-surface-elevated border-b border-border p-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -103,13 +105,16 @@ const Dashboard = () => {
         </div>
       </nav>
 
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto p-6">
+        {/* Welcome Message */}
         <div className="mb-8">
           <h2 className={`text-2xl font-bold mb-2 ${language === 'ta' ? 'text-tamil' : ''}`}>
             {content.welcomeMessage}
           </h2>
         </div>
 
+        {/* Dashboard Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {content.cards.map((card, index) => (
             <Card key={index} className="trust-card">
@@ -128,6 +133,7 @@ const Dashboard = () => {
           ))}
         </div>
 
+        {/* Recent Activity & Quick Actions */}
         <div className="grid lg:grid-cols-2 gap-6">
           <Card className="trust-card">
             <h3 className={`text-lg font-semibold mb-4 ${language === 'ta' ? 'text-tamil' : ''}`}>
@@ -144,26 +150,68 @@ const Dashboard = () => {
             </h3>
             <div className="space-y-2">
               {role === 'borrower' && (
-                <Button className="w-full btn-trust">
-                  <span className={language === 'ta' ? 'text-tamil' : ''}>
-                    {language === 'en' ? 'Apply for Loan' : 'கடனுக்கு விண்ணப்பிக்கவும்'}
-                  </span>
-                </Button>
+                <>
+                  <Button 
+                    className="w-full btn-trust"
+                    onClick={() => navigate("/borrower/apply-loan")}
+                  >
+                    <span className={language === 'ta' ? 'text-tamil' : ''}>
+                      {language === 'en' ? 'Apply for Loan' : 'கடனுக்கு விண்ணப்பிக்கவும்'}
+                    </span>
+                  </Button>
+                  <Button 
+                    className="w-full btn-destructive"
+                    onClick={() => navigate("/complaints")}
+                  >
+                    <span className={language === 'ta' ? 'text-tamil' : ''}>
+                      {language === 'en' ? 'Raise Complaint' : 'புகார் அளிக்கவும்'}
+                    </span>
+                  </Button>
+                </>
               )}
+
               {role === 'lender' && (
-                <Button className="w-full btn-success">
-                  <span className={language === 'ta' ? 'text-tamil' : ''}>
-                    {language === 'en' ? 'Browse Borrowers' : 'கடன் வாங்குபவர்களைப் பார்க்கவும்'}
-                  </span>
-                </Button>
+                <>
+                  <Button className="w-full btn-success">
+                    <span className={language === 'ta' ? 'text-tamil' : ''}>
+                      {language === 'en' ? 'Browse Borrowers' : 'கடன் வாங்குபவர்களைப் பார்க்கவும்'}
+                    </span>
+                  </Button>
+                  <Button 
+                    className="w-full btn-destructive"
+                    onClick={() => navigate("/complaints")}
+                  >
+                    <span className={language === 'ta' ? 'text-tamil' : ''}>
+                      {language === 'en' ? 'Raise Complaint' : 'புகார் அளிக்கவும்'}
+                    </span>
+                  </Button>
+                </>
               )}
+
               {role === 'admin' && (
-                <Button className="w-full btn-premium">
-                  <span className={language === 'ta' ? 'text-tamil' : ''}>
-                    {language === 'en' ? 'Review KYC' : 'KYC மதிப்பாய்வு'}
-                  </span>
-                </Button>
+                <>
+                  <Button className="w-full btn-premium">
+                    <span className={language === 'ta' ? 'text-tamil' : ''}>
+                      {language === 'en' ? 'Review KYC' : 'KYC மதிப்பாய்வு'}
+                    </span>
+                  </Button>
+                  <Button 
+                    className="w-full btn-destructive"
+                    onClick={() => navigate("/admin/complaints")}
+                  >
+                    <span className={language === 'ta' ? 'text-tamil' : ''}>
+                      {language === 'en' ? 'Review Complaints' : 'புகார்களை மதிப்பாய்வு செய்யவும்'}
+                    </span>
+                  </Button>
+                </>
               )}
+
+              {/* 🔹 Common Button for All Roles */}
+              <Button className="w-full btn-outline">
+                <span className={language === 'ta' ? 'text-tamil' : ''}>
+                  {language === 'en' ? 'View Profile' : 'சுயவிவரம் காண்க'}
+                </span>
+              </Button>
             </div>
           </Card>
         </div>
