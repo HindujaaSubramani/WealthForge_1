@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { supabase } from "@/lib/supabaseClient";  // ✅ Import Supabase client
 
 const Login = () => {
   const [language, setLanguage] = useState<'en' | 'ta'>('en');
@@ -14,6 +15,7 @@ const Login = () => {
     email: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const content = {
@@ -41,9 +43,23 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login - navigate to role selection
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      alert(`Login failed: ${error.message}`);
+      return;
+    }
+
+    // ✅ If login success, redirect
     navigate('/role-selection');
   };
 
@@ -79,7 +95,7 @@ const Login = () => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   className="trust-input"
                 />
@@ -94,7 +110,7 @@ const Login = () => {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     className="trust-input pr-10"
                   />
@@ -110,9 +126,9 @@ const Login = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full btn-trust">
+              <Button type="submit" className="w-full btn-trust" disabled={loading}>
                 <span className={language === 'ta' ? 'text-tamil' : ''}>
-                  {content[language].signIn}
+                  {loading ? 'Signing in...' : content[language].signIn}
                 </span>
               </Button>
 
