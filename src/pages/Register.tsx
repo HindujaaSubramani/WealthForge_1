@@ -76,48 +76,70 @@ const Register = () => {
       alert(content[language].passwordMismatch);
       return;
     }
-    if (!agreed) return;
+
+    if (!agreed) {
+      alert("You must agree to the Terms");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      // Step 1: Register user in Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
+      // 1️⃣ Sign up user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            phone: formData.phone,
-          },
-        },
       });
 
-      if (error) {
-        alert(error.message || content[language].registrationFailed);
+      if (signUpError) {
+        alert(signUpError.message || content[language].registrationFailed);
         setLoading(false);
         return;
       }
 
-      // Step 2: Insert into "profiles" table
-      if (data.user) {
-        const { error: insertError } = await supabase.from("profiles").insert([
-          {
-            id: data.user.id, // use auth uid as primary key
-            full_name: formData.fullName,
-            phone: formData.phone,
-            email: formData.email,
-          },
-        ]);
-
-        if (insertError) {
-          console.error("Insert error:", insertError.message);
-        }
+      if (!signUpData.user) {
+        alert("User signup failed. Please try again.");
+        setLoading(false);
+        return;
       }
 
-      // Step 3: Redirect to KYC upload page
+      // 2️⃣ Auto sign-in immediately
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+      if (signInError) {
+        alert(signInError.message || content[language].registrationFailed);
+        setLoading(false);
+        return;
+      }
+
+      const userId = signInData.user.id;
+
+      // 3️⃣ Insert profile row (matches RLS)
+      const { error: insertError } = await supabase.from("profiles").insert([
+        {
+          id: userId, // must match auth UID
+          full_name: formData.fullName,
+          phone: formData.phone,
+          email: formData.email,
+        },
+      ]);
+
+      if (insertError) {
+        console.error("Profile insert error:", insertError.message);
+        alert(
+          "Profile creation failed. Make sure your email is unique or try again later."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // 4️⃣ Redirect to KYC upload page
       navigate("/kyc-upload");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       alert(content[language].registrationFailed);
     } finally {
@@ -131,9 +153,7 @@ const Register = () => {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <span className={language === "ta" ? "text-tamil" : ""}>
-              {content[language].backToHome}
-            </span>
+            {content[language].backToHome}
           </Button>
           <LanguageToggle
             currentLanguage={language}
@@ -141,31 +161,18 @@ const Register = () => {
           />
         </div>
 
-        <Card className="trust-card">
+        <Card>
           <CardHeader className="text-center">
-            <CardTitle
-              className={`text-2xl font-bold text-trust-blue ${
-                language === "ta" ? "text-tamil" : ""
-              }`}
-            >
+            <CardTitle className="text-2xl font-bold text-trust-blue">
               {content[language].title}
             </CardTitle>
-            <CardDescription
-              className={language === "ta" ? "text-tamil" : ""}
-            >
-              {content[language].subtitle}
-            </CardDescription>
+            <CardDescription>{content[language].subtitle}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Full Name */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="fullName"
-                  className={language === "ta" ? "text-tamil" : ""}
-                >
-                  {content[language].fullName}
-                </Label>
+                <Label htmlFor="fullName">{content[language].fullName}</Label>
                 <Input
                   id="fullName"
                   type="text"
@@ -174,18 +181,12 @@ const Register = () => {
                     setFormData({ ...formData, fullName: e.target.value })
                   }
                   required
-                  className="trust-input"
                 />
               </div>
 
               {/* Email */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className={language === "ta" ? "text-tamil" : ""}
-                >
-                  {content[language].email}
-                </Label>
+                <Label htmlFor="email">{content[language].email}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -194,18 +195,12 @@ const Register = () => {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
-                  className="trust-input"
                 />
               </div>
 
               {/* Phone */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="phone"
-                  className={language === "ta" ? "text-tamil" : ""}
-                >
-                  {content[language].phone}
-                </Label>
+                <Label htmlFor="phone">{content[language].phone}</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -214,83 +209,55 @@ const Register = () => {
                     setFormData({ ...formData, phone: e.target.value })
                   }
                   required
-                  className="trust-input"
                 />
               </div>
 
               {/* Password */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="password"
-                  className={language === "ta" ? "text-tamil" : ""}
+              <div className="space-y-2 relative">
+                <Label htmlFor="password">{content[language].password}</Label>
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-2"
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  {content[language].password}
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    required
-                    className="trust-input pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </Button>
               </div>
 
               {/* Confirm Password */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="confirmPassword"
-                  className={language === "ta" ? "text-tamil" : ""}
-                >
+              <div className="space-y-2 relative">
+                <Label htmlFor="confirmPassword">
                   {content[language].confirmPassword}
                 </Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    required
-                    className="trust-input pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={() =>
-                      setShowConfirmPassword(!showConfirmPassword)
-                    }
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    setFormData({ ...formData, confirmPassword: e.target.value })
+                  }
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-2"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff /> : <Eye />}
+                </Button>
               </div>
 
               {/* Terms */}
@@ -298,40 +265,24 @@ const Register = () => {
                 <Checkbox
                   id="terms"
                   checked={agreed}
-                  onCheckedChange={(checked) =>
-                    setAgreed(checked as boolean)
-                  }
+                  onCheckedChange={(checked) => setAgreed(checked as boolean)}
                 />
-                <Label
-                  htmlFor="terms"
-                  className={`text-sm ${
-                    language === "ta" ? "text-tamil" : ""
-                  }`}
-                >
-                  {content[language].agreeTerms}
-                </Label>
+                <Label htmlFor="terms">{content[language].agreeTerms}</Label>
               </div>
 
               {/* Submit */}
               <Button
                 type="submit"
-                className="w-full btn-trust"
+                className="w-full"
                 disabled={!agreed || loading}
               >
                 {loading ? "Creating..." : content[language].createAccount}
               </Button>
 
               <div className="text-center text-sm text-muted-foreground">
-                <span className={language === "ta" ? "text-tamil" : ""}>
-                  {content[language].alreadyAccount}
-                </span>{" "}
-                <Link
-                  to="/login"
-                  className="text-trust-blue hover:underline"
-                >
-                  <span className={language === "ta" ? "text-tamil" : ""}>
-                    {content[language].signIn}
-                  </span>
+                {content[language].alreadyAccount}{" "}
+                <Link to="/login" className="text-trust-blue hover:underline">
+                  {content[language].signIn}
                 </Link>
               </div>
             </form>
